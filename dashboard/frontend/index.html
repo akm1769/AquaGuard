@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaGuard - Farmer Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🌊 AquaGuard</h1>
+            <nav>
+                <button onclick="toggleTheme()" id="theme-btn" aria-label="Toggle theme" style="background:var(--navbar-bg);border:1px solid var(--border);color:var(--text-primary);padding:0.4rem 0.8rem;border-radius:6px;cursor:pointer;font-family:inherit;">Dark</button>
+                <button onclick="openMarketplace()" data-tab="marketplace">Marketplace</button>
+                <button onclick="openDashboard()" data-tab="monitoring">Monitoring</button>
+                <button onclick="openAlerts()" data-tab="alerts">Alerts</button>
+            </nav>
+        </header>
+
+        <main>
+            <div id="connection-error" style="display:none; color:#ff6b6b; padding:0.5rem; background:rgba(255,0,0,0.1); border-radius:6px; margin-bottom:1rem;"></div>
+            <div id="loading-indicator" style="display:none; color:var(--text-secondary); padding:0.5rem;">Loading backend analysis...</div>
+
+            <section id="monitoring" class="tab active">
+                <h2>Water Quality Monitor</h2>
+                <div class="card">
+                    <h3>Current Risk Level</h3>
+                    <div id="risk-level" class="badge">LOW</div>
+                </div>
+                <div class="card" style="margin-top:0.8rem; border-left:3px solid var(--accent);">
+                    <h3>Risk Score <span style="font-weight:400; font-size:0.9rem; color:var(--text-muted);">(backend-calculated)</span></h3>
+                    <div id="risk-score" style="font-size:2rem; font-weight:700; color:var(--text-primary);">--/8</div>
+                    <ul id="recommendations" style="padding-left:1.2rem; color:var(--text-secondary); font-size:0.85rem;"></ul>
+                </div>
+                <div class="cards">
+                    <div class="card">
+                        <h4>pH Level <span style="font-weight:400; color:var(--text-muted); font-size:0.75rem;">(simulated)</span></h4>
+                        <p id="ph-value" style="font-size:1.3rem; font-weight:600;">--</p>
+                    </div>
+                    <div class="card">
+                        <h4>Dissolved Oxygen <span style="font-weight:400; color:var(--text-muted); font-size:0.75rem;">(simulated)</span></h4>
+                        <p id="doe-value" style="font-size:1.3rem; font-weight:600;">--</p>
+                    </div>
+                    <div class="card">
+                        <h4>Ammonia <span style="font-weight:400; color:var(--text-muted); font-size:0.75rem;">(simulated)</span></h4>
+                        <p id="ammonia-value" style="font-size:1.3rem; font-weight:600;">--</p>
+                    </div>
+                    <div class="card">
+                        <h4>Temperature <span style="font-weight:400; color:var(--text-muted); font-size:0.75rem;">(simulated)</span></h4>
+                        <p id="temp-value" style="font-size:1.3rem; font-weight:600;">--</p>
+                    </div>
+                </div>
+                <div style="margin:0.5rem 0 1.5rem 0; padding:0.6rem; background:rgba(255,165,0,0.08); border:1px solid rgba(255,165,0,0.25); border-radius:6px; color:#ffaa00; font-size:0.85rem; font-weight:500;">
+                    ⚠ SIMULATED DATA — These water-quality values are demonstration inputs, not real sensor measurements.
+                </div>
+            </section>
+
+            <section id="alerts" class="tab">
+                <h2>Farm Alerts</h2>
+                <div class="card">
+                    <h3>Alert Status</h3>
+                    <div id="alerts-loading" style="display:none; color:var(--text-secondary); padding:0.5rem;">Loading alerts...</div>
+                    <div id="alerts-error" style="display:none; color:#ff6b6b; padding:0.5rem; background:rgba(255,0,0,0.08); border:1px solid rgba(255,0,0,0.2); border-radius:6px;"></div>
+                    <div id="alerts-empty" style="padding:1rem; background:var(--card-bg); border:1px solid var(--border); border-radius:8px; text-align:center;">
+                        <div style="font-size:2rem; margin-bottom:0.5rem;">📭</div>
+                        <h4 style="margin:0; color:var(--text-primary);">No alerts recorded</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.3rem;">The demo farm (demo-farm-001) currently has zero alerts in the database.</p>
+                        <button onclick="loadAlertsData()" style="margin-top:0.8rem; padding:0.5rem 1rem; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer; font-family:inherit; font-weight:600;">Refresh Alerts</button>
+                    </div>
+                    <ul id="alerts-list" style="padding-left:1.2rem; color:var(--text-secondary); font-size:0.9rem; margin-top:1rem;"></ul>
+                </div>
+            </section>
+
+            <section id="marketplace" class="tab">
+                <h2>Aquaculture Marketplace</h2>
+                <div class="card" style="margin-bottom:1rem;">
+                    <span class="badge" style="font-size:0.9rem; padding:0.3rem 0.8rem; background:var(--accent); color:#fff;">Coming Soon</span>
+                    <h3 style="margin-top:0.5rem;">Future Features — Coming Soon</h3>
+                    <p style="color:var(--text-secondary); line-height:1.6;">We are building a farmer-to-buyer marketplace for aquaculture products. Browse prices, connect with nearby buyers, and manage sales — all in one place.</p>
+                </div>
+                <div class="cards">
+                    <div class="card">
+                        <h4>💧 Water Quality Tools</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">Testing kits, pH monitors, dissolved-oxygen sensors, and ammonia detectors for farm-level water assessment.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🛒 Farm Supplies</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">Feed, probiotics, vitamins, water treatments, and pond-management consumables.</p>
+                    </div>
+                    <div class="card">
+                        <h4>⚙ Pond Equipment</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">Aerators, pumps, filtration systems, and pond liners for small-scale operations.</p>
+                    </div>
+                    <div class="card">
+                        <h4>📚 Farmer Resources</h4>
+                        <p style="color:var(--text-secondary); font-size:0.9rem;">Guides, best-practice guides, disease identification resources, and community tips.</p>
+                    </div>
+                </div>
+                <div style="margin-top:1.5rem;">
+                    <button onclick="switchTab('monitoring')" style="padding:0.6rem 1.2rem; background:var(--accent); color:#fff; border:none; border-radius:6px; cursor:pointer; font-family:inherit; font-weight:600;">Back to Monitoring</button>
+                </div>
+            </section>
+
+            </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+    (function(){
+        function applyTheme(t){
+            document.documentElement.setAttribute('data-theme', t);
+            var btn = document.getElementById('theme-btn');
+            if(btn) btn.textContent = (t === 'dark') ? 'Light' : 'Dark';
+        }
+        window.toggleTheme = function(){
+            var c = document.documentElement.getAttribute('data-theme') || 'light';
+            var n = (c === 'light') ? 'dark' : 'light';
+            applyTheme(n);
+            localStorage.setItem('aqua-theme', n);
+        };
+        applyTheme(localStorage.getItem('aqua-theme') || 'light');
+    })();
+    </script>
+</body>
+</html>
