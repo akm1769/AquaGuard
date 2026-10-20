@@ -3,7 +3,8 @@
 // Backend API configuration.
 // The dashboard is served from a static server during development;
 // the FastAPI backend runs on the port listed here.
-const API_BASE_URL = "http://localhost:8000";
+// Local: backend at localhost:8000; Vercel same-origin: /api
+const API_BASE_URL = (typeof window !== "undefined" && window.API_URL) ? window.API_URL : (location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "http://localhost:8000" : "/api");
 
 // Demonstration readings used only when the backend is reachable and
 // returns a valid response. These are clearly labeled as simulated

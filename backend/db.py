@@ -1,42 +1,34 @@
-"""SQLite database module for AquaGuard.
+"""SQLite / PostgreSQL dual database module for AquaGuard.
 
-Provides centralized database access for farms, ponds, water-quality readings,
-disease predictions, and alerts. Uses the built-in sqlite3 library.
-
-All connections enforce PRAGMA foreign_keys=ON and use a consistent path
-resolved from this module's location.
-
-The frontend sends farm_id="demo-farm-001" as a string. To avoid breaking
-this contract, farms.id is TEXT and stores the exact farm_id from the API.
+Uses built-in sqlite3 when DATABASE_URL is not set; uses psycopg2
+when DATABASE_URL is configured. All SQL is kept compatible with both.
 """
 import sqlite3
 import os
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 
-# Resolve database path relative to project root (one directory above backend/)
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _DB_PATH = os.path.join(_PROJECT_ROOT, "alerts.db")
 
 
-def get_db_path() -> str:
-    """Return the absolute path to the SQLite database file."""
-    return _DB_PATH
+def _is_postgres() -> bool:
+    return bool(os.environ.get("DATABASE_URL"))
 
 
-def _get_connection() -> sqlite3.Connection:
-    """Create a new SQLite connection with foreign keys enabled.
-
-    Returns:
-        sqlite3.Connection with foreign_keys=ON.
-
-    Note:
-        Callers must close the connection (use context manager or try/finally).
-    """
-    conn = sqlite3.connect(_DB_PATH, timeout=30)
-    conn.execute("PRAGMA foreign_keys=ON")
-    conn.row_factory = sqlite3.Row  # Enable named-column access
-    return conn
+def _get_connection():
+    if _is_postgres():
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        conn.set_session(readonly=False, autocommit=False)
+        # Note: psycopg2 does not require PRAGMA foreign_keys; enforce via schema
+        return conn
+    else:
+        conn = sqlite3.connect(_DB_PATH, timeout=30)
+        conn.execute("PRAGMA foreign_keys=ON")
+        conn.row_factory = sqlite3.Row
+        return conn
 
 
 def init_db() -> None:

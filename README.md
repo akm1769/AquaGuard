@@ -85,6 +85,18 @@ For users running from a different clone directory, replace `A:\demo\DevHack` wi
 
 **Response compatibility preserved:** `POST /water-quality` returns `{"farm_id", "readings", "analysis"}` with `risk_level`, `risk_score`, `recommendations`, `parameters`. `GET /alerts/{farm_id}` returns `[{"id", "disease", "severity", "message"}]`.
 
+## Optional PostgreSQL (Neon) Support
+
+To use PostgreSQL instead of SQLite, set the environment variable before running:
+
+```powershell
+$env:DATABASE_URL = "postgresql://user:password@host.neon.tech/dbname"
+```
+
+When `DATABASE_URL` is set, `backend/db.py` connects via `psycopg2` instead of `sqlite3`. The SQL schema is kept compatible (no `AUTOINCREMENT`; `INTEGER PRIMARY KEY` works on both). If `psycopg2` is not installed, install it (`pip install psycopg2-binary`).
+
+The existing SQLite workflow (`alerts.db`) continues to work when `DATABASE_URL` is absent.
+
 ## Database Schema (SQLite — initialized by `backend/db.py`)
 - `farms` (id TEXT PRIMARY KEY — preserves `demo-farm-001` string)
 - `ponds` (id INTEGER, farm_id → farms)
